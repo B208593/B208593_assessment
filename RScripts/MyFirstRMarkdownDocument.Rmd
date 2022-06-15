@@ -6,6 +6,21 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+[Link to the GitHub repositary] (https://github.com/B208593/B208593_assessment.git)
+# Data dictionary for test data
+## linker
+## adding metadata
+# Loading NHSDataset
+## Introduction what the dataset is eg. Data
+## Upload
+## Viewing the data
+## Subsetting the data
+# Data capture tool
+## Variables
+## Indexing
+## Consent
+## Widgets
+
 
 ## R Markdown
 
