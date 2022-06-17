@@ -127,50 +127,6 @@ write_csv(ae, here("RawData", "ae_attendances.csv"))
 #period, attendances, breaches. Likewise, you may wish examine performance for the different types of department, 
 #we would also need the type variable. For the purpose of this lesson, we will focus on  England as a whole.
 
-## Examining the four-hour waiting time target performance for England
-#We will now use the dplyr package `select()` function to select the required variables. 
-#The dplyr package is loaded by the tidyverse package, as one of its core components. 
-#dplyr provides a grammar of data manipulation, providing a consistent set of verbs that solve 
-#the most common data manipulation challenges.
-#ae<-ae %>% select(index, period, attendances, breaches)
-
-### Let's tabulate the subsetted ae_attendances data
-ae %>%
-  mutate_at(vars(period), format, "%b-%y") %>% 
-  mutate_at(vars(attendances, breaches), comma) %>%
-  head(10) %>%
-  kable()
-
-
-
-# Let's calculate monthly four hour waiting time target performance for England as a whole
-#We will now use the dplyr package `summarise_at()` function to get the `sum` of all attendances and breaches for England as a whole.
-ENG_performance <- ae %>%
-  group_by(period) %>%
-  summarise_at(vars(attendances, breaches), sum) %>%
-  mutate(performance = 1- breaches / attendances)
-
-glimpse(ENG_performance)
-
-
-### Let's visualise monthly four hour waiting time target performance before we save or raw data file.
-#using ggplot2 is a powerful package to draw graphics. It implements the grammar of graphics (and hence its name).
-#The ggplot2 package is loaded by the tidyverse package, as one of its core components. 
-
-ggplot(ENG_performance, aes(period, performance)) +
-  geom_line(color = "darkcyan") +
-  geom_point(color = "darkcyan") +
-  scale_y_continuous(labels = percent) +
-  scale_x_date(date_labels = "%b-%y", date_breaks = "11 month")+
-  labs(x = "Month of attendance",
-       y = "% of A&E attendances that met the four hour standard",
-       title = "NHS England accident and emergency (A&E) four hour performance",
-       caption = "Source: NHSRdatasets")
-
-#The National Health Service (NHS) is always under considerable pressure over the winter period as demand for services tends 
-#to increase significantly with the onset of cold weather and flu.(NHS Providers, 2022) 
-#You can clearly see that under the winter pressures  where four hour waiting time target performance drops.
-
 
 ## Let's select the ae_attendances data subset for further exploratory analysis
 #Based on this brief probe of the of the ae_attendances data, 
@@ -192,21 +148,20 @@ ae %>%
 glimpse(ae)
 
 #chosen variables (6)
-Index, period, org_ code, attendance, breaches and performance
+#Index, period, org_ code, attendance, breaches and performance
 
-#version 1 (leave breaches and attendances)
-ae2<-ae %>% select(-org_code, -admissions)
-ae3 <- ae2 %>% filter(type=="1")
-
-#version 2 (leave only org, type and performance)
-ae2<-ae %>% select(-attendances, -breaches, -admissions) %>%
-  filter(type=="1")
-
+#filter type 1 departments and select variables for the data capture tool
 ae2<-ae %>%
   filter(type=="1") %>%
   select(-type, -admissions) 
 
-write_csv(ae2, here("RawData", "ae_type1_performance.csv"))
+ae2 %>%
+  mutate_at(vars(period), format, "%b-%y") %>% 
+  mutate_at(vars(attendances, breaches), comma) %>%
+  head(10) %>%
+  kable()
+
+write_csv(ae2, here("RawData", "ae_type1_performance.full.csv"))
 
 
 ## Separating provisional ae_attendances_ENG_4hr_perfom data into training and testing sets
@@ -217,7 +172,7 @@ write_csv(ae2, here("RawData", "ae_type1_performance.csv"))
 
 ### How many rows are in the ae_attendances_ENG_4hr_perfom dataset?
 #The ae_attendances_ENG_4hr_perfom dataset is large with 
-nrow(ae) #rows of data
+nrow(ae2) #rows of data
 
 
 #We do not want you to spend hours inputting rows and rows of data into your data capture tool. 
@@ -279,6 +234,7 @@ write_csv(ae2TestMarker, here("Data", "ae_type1_performance_test_marker_full.csv
 
 ### We then need to set aside the remaining records for you to test (or collect with your) your data-capture tool.
 ae2Test  <- ae2Test[2:nrow(ae2Test),]
+
 
 #### Let's tabulate ae_attendances_ENG_4hr_perfom test data for your report
 ae2Test  %>%
