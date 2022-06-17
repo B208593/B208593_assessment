@@ -7,19 +7,42 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 [Link to the GitHub repositary] (https://github.com/B208593/B208593_assessment.git)
-# Data dictionary for test data
+
+```{r a,message = FALSE, warning = FALSE}
+library(NHSRdatasets)
+library(tidyverse)
+```
+
+
+# 1. Data dictionary for test data
+
 ## linker
-## adding metadata
-# Loading NHSDataset
-## Introduction what the dataset is eg. Data
-## Upload
-## Viewing the data
-## Subsetting the data
-# Data capture tool
+
+## adding metadata  
+
+Metadata describes other data in order to help others to find, access, understand, and reuse the data.
+
+# 2. Data capture tool in Python
+
 ## Variables
+
 ## Indexing
+
 ## Consent
+
 ## Widgets
+
+# 3. Loading NHS Dataset
+
+## Introduction what the dataset is eg. Data
+
+## Upload
+
+## Viewing the data
+
+## Subsetting the data
+
+
 
 
 ## R Markdown
