@@ -1,0 +1,27 @@
+variable name,variable description,variable options,notes
+attendances,The number of attendances for this department type at this organisation for this month.,3801 to 12753,The number of attendances for type 1 department at this organisation for this month
+breaches,The number of attendances that breached the four-hour target.,86 to 3178,The number of attendances that breached the four-hour target
+consent,The consent from the end-user to process and share the data collected with the data capture tool.,TRUE,The consent from the end-user to process and share the data collected with the data capture tool
+index,The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.,2826 to 12463,The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder
+org_code,"The Organisation data service (ODS) code for the organisation. If you want to know the organisation associated with a particular ODS code, you can look it up from the following address: https://odsportal.digital.nhs.uk/Organisation/Search.",RGT,NHS Trust - CAMBRIDGE UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RGT)
+ , ,RM1,NHS Trust - NORFOLK AND NORWICH UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RM1)
+ , ,RRK,NHS Trust - UNIVERSITY HOSPITALS BIRMINGHAM NHS FOUNDATION TRUST (RRK)
+ , ,RJN,NHS Trust - EAST CHESHIRE NHS TRUST (RJN)
+ , ,RNZ,NHS Trust - SALISBURY NHS FOUNDATION TRUST (RNZ)
+ , ,RQ3,NHS Trust - BIRMINGHAM WOMEN'S AND CHILDREN'S NHS FOUNDATION TRUST (RQ3)
+ , ,RBL,NHS Trust - WIRRAL UNIVERSITY TEACHING HOSPITAL NHS FOUNDATION TRUST (RBL)
+ , ,R1K,NHS Trust - LONDON NORTH WEST UNIVERSITY HEALTHCARE NHS TRUST (R1K)
+ , ,RPA,NHS Trust - MEDWAY NHS FOUNDATION TRUST (RPA)
+ , ,RA3,NHS Trust - WESTON AREA HEALTH NHS TRUST (RA3)
+ , ,RDE,NHS Trust - EAST SUFFOLK AND NORTH ESSEX NHS FOUNDATION TRUST (RDE)
+performance,The performance ([1 - breaches]/attendances) calculated for the whole of England.,0.71 to 0.98,The performance ([1 - breaches]/attendances) calculated
+period,"The month that this activity relates to, stored as a date (1st of each month).",16983,"The month that this activity relates to, stored as a date"
+ , ,16892,"The month that this activity relates to, stored as a date"
+ , ,17501,"The month that this activity relates to, stored as a date"
+ , ,17471,"The month that this activity relates to, stored as a date"
+ , ,17379,"The month that this activity relates to, stored as a date"
+ , ,17287,"The month that this activity relates to, stored as a date"
+ , ,17956,"The month that this activity relates to, stored as a date"
+ , ,17805,"The month that this activity relates to, stored as a date"
+ , ,17652,"The month that this activity relates to, stored as a date"
+ , ,17622,"The month that this activity relates to, stored as a date"
