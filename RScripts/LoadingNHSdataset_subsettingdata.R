@@ -204,6 +204,7 @@ nrow(ae2Train)
 ### Let's tabulate ae_attendances_ENG_4hr_perfom training data for your report
 ae2Train %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
+  mutate_at(vars(attendances, breaches), comma) %>%
   head(10) %>%
   kable()
 
@@ -226,6 +227,7 @@ ae2TestMarker  <- ae2Test[1,]
 #### Let's tabulate ae_attendances_ENG_4hr_perfom marker test data for your report
 ae2TestMarker  %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
+  mutate_at(vars(attendances, breaches), comma) %>%
   head(10) %>%
   kable()
 
@@ -239,6 +241,7 @@ ae2Test  <- ae2Test[2:nrow(ae2Test),]
 #### Let's tabulate ae_attendances_ENG_4hr_perfom test data for your report
 ae2Test  %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
+  mutate_at(vars(attendances, breaches), comma) %>%
   head(10) %>%
   kable()
 
