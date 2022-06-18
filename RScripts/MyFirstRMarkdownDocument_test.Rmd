@@ -7,21 +7,21 @@ output:
   pdf_document: default
   html_document: default
 ---
-
-**To set global options that apply to every chunk in the file** 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-[Link to the GitHub repositary] (https://github.com/B208593/B208593_assessment.git)
+[Link to the GitHub repositary] (https://github.com/B208593/B208593_assessment.git)  
 
-
-# 1. Loading NHSRdatasets
-The data I used for this assessment are from the NHSRdatasets package: the NHS England accident and emergency attendances and admissions (ae_attendances) data set.
-
+# I. Loading NHSRdatasets
+The data I used for this assessment are from the NHSRdatasets package: the NHS England accident and emergency attendances and admissions (ae_attendances) data set.  
 
 ## Load packages and data
+### Load packages
+First we need to load the packages we will use in the script.
 ```{r a,message = FALSE, warning = FALSE, results='hide'}
 library(NHSRdatasets)
+```
+```{r d,message = FALSE, warning = FALSE, results='hide'}
 library(tidyverse)
 ```
 ```{r b,message = FALSE, warning = FALSE}
@@ -30,9 +30,6 @@ library(here)
 ```{r c,message = FALSE, warning = FALSE}
 library(knitr)
 ```
-```{r d,message = FALSE, warning = FALSE}
-library(scales)
-```
 ```{r e,message = FALSE, warning = FALSE}
 library(lubridate)
 ```
@@ -40,33 +37,33 @@ library(lubridate)
 library(caret)
 ```
 
-Load the NHS England accident and emergency attendances and admissions (ae_attendances) dataset
+### Load the NHS England accident and emergency attendances and admissions (ae_attendances) dataset
 ```{r g,message = FALSE, warning = FALSE, results='hide'}
 data(ae_attendances)
 ```
 
-## Take a look at the ae_attendances data
+## **Viewing the ae_attendances data**
 ```{r h,message = FALSE, warning = FALSE, results='hide'}
 data(ae_attendances)
 ae<-ae_attendances
 class(ae)
 ```
 
-An overview of your data
+*An overview of the A&E data*
 ```{r i,message = FALSE, warning = FALSE, results='hide'}
 ae
 ```
 
-## The original dataset contains 
+### The original dataset contains the following variables:
 
 * **period:** the month that this activity relates to, stored as a date (1st of each month).  
 
-*	**org_code:** the Organisation data service (ODS) code for the organisation. The ODS code is a unique code created by the Organisation data service within [NHS Digital](_https://www.digitalsocialcare.co.uk/latest-guidance/how-to-find-your-ods-code/), and used to identify organisations across health and social care. ODS codes are required in order to gain access to national systems like NHSmail and the Data Security and Protection Toolkit.
+*	**org_code:** the Organisation data service (ODS) code is a unique code for the organisation created by the Organisation data service within [NHS Digital](_https://www.digitalsocialcare.co.uk/latest-guidance/how-to-find-your-ods-code/), and used to identify organisations across health and social care.
 
 *	**type:** the Department Type for this activity, either  
     + **1:** Emergency departments are a consultant led 24 hour service with full resuscitation facilities and designated accommodation for the reception of accident and emergency patients,  
     + **2:** Consultant led mono specialty accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients, or  
-    + **other:** Other type of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients. The department may be doctor led or nurse led and treats at least minor injuries and illnesses and can be routinely accessed without appointment. A service mainly or entirely appointment based (for example a GP Practice or Out-patient clinic) is excluded even though it may treat a number of patients with minor illness or injury. Excludes NHS walk-in centres.[(National Health Service, 2020)](https://eu01.alma.exlibrisgroup.com/leganto/public/44UOE_INST/citation/37459630310002466?auth=SAML) 
+    + **other:** Other type of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients.
    
 * **attendances:** the number of attendances for this department type at this organisation for this month.    
 
@@ -74,13 +71,13 @@ ae
 
 *	**admissions:** the number of attendances that resulted in an admission to the hospital.[(Chris Mainey, 2021)](https://eu01.alma.exlibrisgroup.com/leganto/public/44UOE_INST/citation/37444097490002466?auth=SAML)
 
-The `glimpse()` function is from *tibble* package and is great to view the columns/variables in a data frame.
+**Viewing the columns/variables in a data frame we use the `glimpse()` function  **
 ```{r j,message = FALSE, warning = FALSE, results='hide'}
 glimpse(ae) 
 ```
 
-## Missing data
-Missing data can significantly impact any attempt to gain useful insight from data. Therefore need to check for missing data in the ae_attendances data.   
+### Missing data
+We need to check for missing data in the ae_attendances data as missing data can significantly impact any attempt to gain useful insight from data.   
 ```{r k,message = FALSE, warning = FALSE, results='hide'}
 # Calculate how many NAs there are in each variable
 ae %>% 
@@ -88,13 +85,13 @@ ae %>%
 map(sum)
 ```
 
-## Adding index column to raw data 
+### Adding index column to raw data 
 To develop and evaluate the data capture tool, the raw data is needed to be split into training and testing sets. We need to add an index column to the raw data so we can link the partitioned data sets to the raw data 
 ```{r l,message = FALSE, warning = FALSE, results='hide'}
 ae <- rowid_to_column(ae, "index")
 ```
 
-## Let's tablulate the raw data for the report
+### Tablulate the raw data for the report
 To assists the reader in quickly determining the magnitude of the numbers they are looking at.
 ```{r m,message = FALSE, warning = FALSE, results='hide'}
 ae %>%
@@ -108,18 +105,19 @@ ae %>%
   kable()
 ```
 
-## Let's save the raw ae_attendances data to your 'RawData' folder
+### Save the raw ae_attendances data to your 'RawData' folder
 ```{r n,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae, here("RawData", "ae_attendances.csv"))
 ```
 
-## Calculate monthly four hour waiting time target performance for England as a whole
+### Creating a new variable
+Calculate monthly four hour waiting time target performance
 ```{r o,message = FALSE, warning = FALSE, results='hide'}
 ae<- ae %>%
 mutate(performance = round(1- breaches / attendances,2))
 ```
 
-### Let's tabulate the ae_attendances data
+### Tabulate the updated ae_attendances data
 ```{r p,message = FALSE, warning = FALSE, results='hide'}
 ae %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
@@ -128,7 +126,8 @@ ae %>%
   kable()
 ```
 
-## Selecting variables for data capture tool: Index, period, org_ code, attendance, breaches and performance
+## Selecting variables for data capture tool 
+The variables I have selected for the data capture tool:Index, period, org_ code, attendance, breaches and performance
 
 ### Filter type 1 A&E departments and select variables for the data capture tool
 ```{r r,message = FALSE, warning = FALSE, results='hide'}
@@ -156,29 +155,25 @@ write_csv(ae2, here("RawData", "ae_type1_performance.full.csv"))
 nrow(ae2) 
 ```
 
-### A test data set of 10-15 records to capture with and evaluate your data capture tool is sufficient for the purpose of the course assignment. Here is how to work out the proportion (`prop`) of the raw data to assign to the training data:
+##Partitioning the raw data into the test and training data
+We have to work out the proportion (`prop`) of the raw data to assign to the training data:
 ```{r w,message = FALSE, warning = FALSE, results='hide'}
 prop<-(1-(15/nrow(ae2)))
-```
-
-### The proportion of the raw that needs to be assigned to the training data to ensure there is only 10 to 15 records in the test data is: 
-```{r x,message = FALSE, warning = FALSE, results='hide'}
+#The proportion of the raw that needs to be assigned to the training data to ensure there is only 10 to 15 records in the test data is:
 print(prop)
 ```
 
-
-### Use the createDataPartition() function from the caret package to splint our raw data into test and training data sets. The 'set.seed()' function is a random number generator, which is useful for creating random objects that can be reproduced. This will make sure that every time we run this script, we will partition the raw data into the same test and training data.
+### The 'set.seed()' function is a random number generator, which is useful for creating random objects that can be reproduced. This will make sure that every time we run this script, we will partition the raw data into the same test and training data.
 ```{r seed,message = FALSE, warning = FALSE, results='hide'}
 set.seed(333)
 ```
 
-### Partitioning the raw data into the test and training data.
+### We will use the createDataPartition() function from the caret package to splint our raw data into test and training data sets. 
 ```{r pr,message = FALSE, warning = FALSE, results='hide'}
 trainIndex <- createDataPartition(ae2$index, p = prop, 
                                   list = FALSE, 
                                   times = 1)
 ```
-
 
 ### All records that are in the trainIndex are assigned to the training data.
 ```{r trainindex,message = FALSE, warning = FALSE, results='hide'}
@@ -190,171 +185,150 @@ ae2Train <- ae2[ trainIndex,]
 nrow(ae2Train)
 ```
 
-### Let's tabulate ae_attendances_ENG_4hr_perfom training data for your report
+### Tabulate ae_type1_performance training data for the report
 ```{r tabulate,message = FALSE, warning = FALSE, results='hide'}
 ae2Train %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
+  mutate_at(vars(attendances, breaches), comma) %>%
   head(10) %>%
   kable()
 ```
 
-### Our next task, it to save ae_attendances_ENG_4hr_perfom training data to your working data folder 'Data'
+### Save ae_type1_performance training data to your working data folder 'Data'
 ```{r write,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae2Train, here("Data", "ae_type1_performance_train_full.csv"))
 ```
 
-### Let's extract the ae_attendances_ENG_4hr_perfom test data. All records that are not in the trainIndex (`-trainIndex`) are assigned to the test data.
+### Extract the ae_type1_performance test data. All records that are not in the trainIndex (`-trainIndex`) are assigned to the test data.
 ```{r test,message = FALSE, warning = FALSE, results='hide'}
 ae2Test  <- ae2[-trainIndex,]
 ```
 
-### Check number or rows
+### Check number of rows
 ```{r nrow2,message = FALSE, warning = FALSE, results='hide'}
 nrow(ae2Test)
 ```
 
-#You now need to set aside the first record from the ae_attendances_ENG_4hr_perfom test data so that your markers can test and evaluate your data-capture tool.
+### We need to set aside the first record from the ae_type1_performance test data so that your markers can test and evaluate your data-capture tool.
 ```{r testmarker,message = FALSE, warning = FALSE, results='hide'}
 ae2TestMarker  <- ae2Test[1,]
 ```
 
-#### Let's tabulate marker test data for your report
+#### Tabulate marker test data for your report
 ```{r tab2,message = FALSE, warning = FALSE, results='hide'}
 ae2TestMarker  %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
+  mutate_at(vars(attendances, breaches), comma) %>%
   head(10) %>%
   kable()
 ```
 
-### Our next task, it to save our ae_attendances_ENG_4hr_perfom marker test data to our working data folder 'Data'
+### Save our ae_attendances_ENG_4hr_perfom marker test data to our working data folder 'Data'
 ```{r csv,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae2TestMarker, here("Data", "ae_type1_performance_test_marker_full.csv"))
 ```
 
-### We then need to set aside the remaining records for you to test (or collect with your) your data-capture tool.
+### We then need to set aside the remaining records to test the data-capture tool.
 ```{r datac,message = FALSE, warning = FALSE, results='hide'}
 ae2Test  <- ae2Test[2:nrow(ae2Test),]
 ```
 
-#### Let's tabulate test data for your report
+### Tabulate test data for the report
 ```{r tab3,message = FALSE, warning = FALSE, results='hide'}
 ae2Test  %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
+  mutate_at(vars(attendances, breaches), comma) %>%
   head(10) %>%
   kable()
 ```
 
-### Our final task, is to save our ae_attendances_ENG_4hr_perfom test data to our working data folder 'Data'
+### Finally save our ae_type1_performance test data to our working data folder 'Data'
 ```{r csv2,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae2Test, here("Data", "ae_type1_performance_test_full.csv"))
 ```
 
-# 2. Data capture tool in Python Jupyter notebook
-## Data upload
-The previously selected subset of the variables for the data capture tool in Raw data folder
+# II. Data capture tool in Python Jupyter notebook
+## 1. Data upload
+We need to upload the previously selected subset of the variables (ae_type1_performance_test_full) for the data capture tool
 
 ### Load the pandas package
-To import the data, you will need to load the pandas package. The Python pandas package is used for data manipulation and analysis.
+To import the data, we will need to load the pandas package which is used for data manipulation and analysis.
 
 ### Data type
-We now need to check the data type in the testData data frame in order to know what type of widget we need to use. Let us use the dtypes function from the Python pandas package to query the data types in the testData.
+We now need to check the data type in the test Data data frame in order to know what type of widget we need to use.
 
-## Empty data frame
-We need to set up an empty data frame in the working data folder to collect the data captured by the Juypter widgets containgin only the variables we want to capture
+## 2. Set up empty data frame
+We need to set up an empty data frame in the working data folder to collect the data captured by the Juypter widgets containing only the variables we want to capture
 
-## Save the empty data frame to your working ‘Data’ folder
+### Save the empty data frame to your working ‘Data’ folder
 Only use once otherwise it will overwrite our data we already input
 
-## Now let’s read in the empty data frame to collect the data from the Jupyter-widgets.
+### Next we have to read in the empty data frame to collect the data from the Jupyter-widgets.
 
-## Indexing in Python
-The first variable contains the index number, that allows us to connect the test data to the original data set “../RawData/ae_attendancesxxx.csv”.
-Indexing in Python is a way to refer the individual items by its position. In other words, you can directly access your elements of choice.
+## 3. Indexing in Python
+The first variable contains the index number, that allows us to connect the test data to the original data set “../RawData/ae_type1_performance_test_full”.
+Indexing in Python is a way to refer the individual items by its position.
 
-## Widgets
+## **4. Widgets**
 Widgets are interactive Python objects that have a representation in the browser. A widget is a graphical user interface element, such as a button, dropdown or textbox. Widgets can be embedded in the Notebook and provide a user-friendly interface to collect the user input and see the impact the changes have on the data/results without interacting with your code.
 
 To use the widget framework, you need to import the ipywidgets Python package.
 
-### Consent
-Consent is a vital area for data protection compliance. Consent means giving data subjects genuine choice and control over how you process their data. If the data subject has no real choice, consent is
-The consent data type has 2 options, TRUE or FALSE
-For consent boolean widget (Checkbox widget) was used that are designed to display a boolean value: TRUE or FALSE.
+### **Consent**
+Consent is a vital area for data protection compliance.
+The consent data type has 2 options, TRUE or FALSE so boolean widget (Checkbox widget) will be used that are designed to display a boolean value.
 
-### Period
-The data type object is a string (represent text rather than numbers)
-We used DatePicker widget to capture/collect date variable
+### **Period**
+Data type is string or character. DatePicker widget was selected to capture/collect period variable
 
-### Org_code
-The org_code variable includes the Organisation data service (ODS) code for the organisation.
-We now need to check the data type: The data type object is also a string.
+### **Org_code**
+Data type  is also a string. Selection widget was selected to capture this variable to display single selection list.
 
-Selection widget used to capture this variable to display single selection list
+### **Attendances, breaches**
+Data type is numeric, integer (real values without decimal points). Numeric widget was selected (IntText) for displaying integers.
 
-
-### Attendances, breaches
-The attendances variable includes the number of attendances for this department type at this organisation for this month.
-The breaches variable includes the number of attendances that breached the four hour target.
-check the data type - integer, float
-
-Numeric widget (IntText) for displaying integers and floats
-
-### performance
-The performance variable was calculated for the whole of England as (1 - breaches)/ attendances.
-It is a float variable.
-Numeric widget - FloatText
+### **Performance**
+Data type is numeric, float. Numeric widget (FloatText) was selected. 
 
 ## Concatenating the collected data to the CollectData data frame.
-The concat() function is used to concatenate pandas objects.
+Every row needs to be filled in the empty data frame by using concat() function to concatenate pandas objects (11 rows of data).
 
-## Have you consent to process and share the data before you save it to the working data folder?
-Before we save our data to file, we must make sure we have consent to do so. The following line of code, will ensure that you have consent to save data.
+## Consent check
+Before we save our data to file, we must make sure we have consent to do so (we have consent filled in as TRUE).
 
 ## Saving the CollectData data frame
-Saving the data collected by your data-capture tool to the working data folder:../Data/CollectedData.csv
+Saving the data collected by the data-capture tool to the working data folder:../Data/CollectedData.csv
 
-## You need to iterate through this Notebook until you have collected all of your test data and then save the captured test data to your ‘RawData’ folder.
+## Save the captured test data to the ‘RawData’ folder.
 
-# Data dictionary
-A data dictionary is an important tool in data management. A data dictionary is a supplementary document that details the information about variables, data collection, and other important features of a data set, i.e. metadata, data that describes other data.
-
-
-## linker
-
-## adding metadata  
-
-Metadata describes other data in order to help others to find, access, understand, and reuse the data.
-
-# **Load packages and read in the data**
+# **III. Data dictionary**
+## **Load packages**
 ```{r load,message = FALSE, warning = FALSE, results='hide'}
 library(dataMeta)
 library (tidyverse)
 library(here)
 ```
 
-# **Data**
-We previously selected a subset of the variables needed for my data capture tool, including period, attendances and breaches, and subsetted the data into test and training data.
-The Jupyter Notebook  \"./ipynbScripts/CollectingDataUsingInteractiveJupyterWidgets.ipynb\" was used to to collect the data.
+## **Data**
+Test data collected by the Jupyter Notebook  \"./ipynbScripts/CollectingDataUsingInteractiveJupyterWidgets.ipynb\".  
 
-Let us use the `read_csv()` function from the *readr* package to read your collected data from the Raw data folder.
-
+### **Read the collected data from the Raw data folder.**
 ```{r data3,message = FALSE, warning = FALSE, results='hide'}
 CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
 ```
 
-## Check type of the period variable 
+### **Check type of the period variable** 
 ```{r data4,message = FALSE, warning = FALSE, results='hide'}
 class(CollectedData$period)
 ```
+It's identified as *date* but we need the period to be *character* for the Data dictionary
 
-It's a date but we need to be character for the Data dictionary
-
-### Change from date to character
+### Change period variable from date to character
 ```{r data5,message = FALSE, warning = FALSE, results='hide'}
 CollectedData$period<-as.character(CollectedData$period)
 ```
 
-check again class
+**check again class**
 ```{r data6,message = FALSE, warning = FALSE, results='hide'}
 class(CollectedData$period)
 ```
