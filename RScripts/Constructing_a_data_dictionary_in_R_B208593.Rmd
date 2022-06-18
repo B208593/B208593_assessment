@@ -1,14 +1,16 @@
 ---
-title: "**Constructing a data dictionary and appending it to your data in R**"
+title: "**Constructing a data dictionary and appending it to the data in R**"
 author: "B208593"
 date: "`r format (Sys.time (), '%d %B, %Y')`"
 output: html_document
 ---
- 
+
+To set global options that apply to every chunk in the file 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-# **Overview**
+
+# **Data dictionary**
 A data dictionary is an important tool in data management. A data dictionary is a supplementary document that details the information about variables, data collection, and other important features of a data set, i.e. metadata, data that describes other data. This metadata is crucial and helps others find, access, understand, and reuse your data. Without proper documentation, the data you store in online repositories may be rendered unfindable and unusable by others and indexing search engines. The *dataMeta* R package is designed to create a data dictionary and append it to the original dataset's attributes list along with other information generally provided as metadata. In this lesson, we will use the *dataMeta* R package to construct a data dictionary for a subset of the NHS England accident and emergency (A&E) attendances and admissions (`ae_attendances`) data from the *NHSRdatasets* package; we will then map the data and then save it as an R dataset (.rds) in your 'RawData' folder.
 
 # **Load packages and read in the data**
@@ -30,6 +32,17 @@ Let us use the `read_csv()` function from the *readr* package to read your colle
 
 ```{r data}
 CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
+```
+
+```{r data}
+class(CollectedData$period)
+```
+```{r data}
+CollectedData$period<-as.character(CollectedData$period)
+```
+
+```{r data}
+class(CollectedData$period)
 ```
 
 
@@ -78,10 +91,10 @@ We need to create a string vector representing the different variable descriptio
 ```{r variable_description}
 variable_description <- c("The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.",
 "The month that this activity relates to, stored as a date (1st of each month).",
-"The Organisation data service (ODS) code for the organisation. If you want to know the organisation associated with a particular ODS code, you can look it up from the following address: https://odsportal.digital.nhs.uk/Organisation/Search.", 
-"The number of attendances for this department type at this organisation for this month.", 
+"The Organisation data service (ODS) code for the organisation.", 
+"The number of attendances for type 1 A&E department at this organisation for this month.", 
 "The number of attendances that breached the four-hour target.",  
-"The performance ([1 - breaches]/attendances) calculated for the whole of England.",
+"The performance ([1 - breaches]/attendances) calculated for type 1 A&E departments.",
 "The consent from the end-user to process and share the data collected with the data capture tool.")
 print(variable_description)
 ```
@@ -110,12 +123,11 @@ We are now going to use the `build_dict()` function from the *dataMeta* to const
 dictionary <- build_dict(my.data = CollectedData, linker = linker)
 glimpse(dictionary)
 ```
+
+x=rows, y=columns
 ```{r notes}
-dictionary[7,4]<-"RDZ: NHS Trust - The Royal Bournemouth and Christchurch Hospitals NHS Foundation Trust."
-#You should do that for all Organisation data service (ODS) in the data dictionary
-dictionary[27,4] <-"other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
-dictionary[28,4]<- "1: Emergency departments are a consultant-led 24-hour service with full resuscitation facilities and designated accommodation for the reception of accident and emergency patients."
-dictionary[29,4] <- "2: Consultant-led mono speciality accident and emergency service (e.g. ophthalmology, dental) with designated accommodation for the reception of patients. other: Other types of A&E/minor injury activity with designated accommodation for the reception of accident and emergency patients."
+dictionary[1,1]<-"The Organisation data service (ODS) code for the organisation."
+dictionary[1,1]<-"The performance ([1 - breaches]/attendances) calculated for type 1 departments."
 ```
  
 
