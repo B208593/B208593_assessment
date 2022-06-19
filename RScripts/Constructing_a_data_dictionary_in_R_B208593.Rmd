@@ -34,17 +34,20 @@ Let us use the `read_csv()` function from the *readr* package to read your colle
 CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
 ```
 
+#check class of period
 ```{r data}
 class(CollectedData$period)
 ```
+
+#Period need to be character so we use as.character()function to change it to character
 ```{r data}
 CollectedData$period<-as.character(CollectedData$period)
 ```
-
+#Check class of period
 ```{r data}
 class(CollectedData$period)
 ```
-
+#now it's character
 
 ## **Let's view the CollectedData ae_attendances data**
 The `glimpse()` function is from *tibble* package and is  used to view the columns/variables in a data frame. It also shows data type and some of the data in the data frame in each row. The *tibble* package provides utilities for handling tibbles. The *tibble* package is loaded by the *tidyverse* package, as one of its core components. 
@@ -104,7 +107,7 @@ We need to create a string vector representing the different variable types. It 
 ```{r glimpse2}
 glimpse(CollectedData) 
 ```
-We have five quantitative values (measured values) variables and four fixed values (allowable values or codes) variables.
+We have four quantitative values (measured values) variables and three fixed values (allowable values or codes) variables.
 ```{r variable_type}
 variable_type <- c(0, 1, 1, 0, 0, 0, 1)
 print(variable_type)
@@ -126,8 +129,8 @@ glimpse(dictionary)
 
 x=rows, y=columns
 ```{r notes}
-dictionary[1,1]<-"The Organisation data service (ODS) code for the organisation."
-dictionary[1,1]<-"The performance ([1 - breaches]/attendances) calculated for type 1 departments."
+dictionary[1,1]<-"."
+dictionary[1,1]<-"."
 ```
  
 
