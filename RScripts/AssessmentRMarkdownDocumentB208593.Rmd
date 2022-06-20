@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 [Link to the GitHub repository] (https://github.com/B208593/B208593_assessment.git)  
 
 # **I. Loading NHSR datasets**
-The data I used for this assessment are from the NHSRdatasets package: the NHS England accident and emergency attendances and admissions (ae_attendances) data set.  
+The data I used for this assessment are from the NHSRdatasets package: the NHS England accident and emergency attendances and admissions (*ae_attendances*) data set.  
 
 
 
@@ -47,7 +47,7 @@ data(ae_attendances)
 ```  
 
 
-## **3. Viewing the ae_attendances data**
+## **3. Viewing the *ae_attendances* data**
 ```{r h,message = FALSE, warning = FALSE, results='hide'}
 data(ae_attendances)
 ae<-ae_attendances
@@ -56,7 +56,7 @@ class(ae)
 
 
 ### **Missing data**
-We need to check for missing data in the ae_attendances data as missing data can significantly impact any attempt to gain useful insight from data.   
+We need to check for missing data in the *ae_attendances* data as missing data can significantly impact any attempt to gain meaningful insight from data.   
 ```{r k,message = FALSE, warning = FALSE, results='hide'}
 # Calculate how many NAs there are in each variable
 ae %>% 
@@ -65,27 +65,27 @@ map(sum)
 ```
 
 ### **Adding index column to raw data** 
-To develop and evaluate the data capture tool, the raw data is needed to be split into training and testing sets. We need to add an index column to the raw data so we can link the partitioned data sets to the raw data. 
+To set up a data capture tool in Python, the raw data are needed to be split into training and testing sets. We need to add an index column to the raw data so we can link the partitioned data sets to the raw data. 
 ```{r l,message = FALSE, warning = FALSE, results='hide'}
 ae <- rowid_to_column(ae, "index")
 ```  
 
 
-### **Save the raw ae_attendances data to your 'RawData' folder**
+### **Save the raw *ae_attendances* data to your 'RawData' folder**
 ```{r n,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae, here("RawData", "ae_attendances.csv"))
 ```
 
 ### **Creating a new variable**
-Calculate monthly four hour waiting time target performance
+We need to calculate monthly four hour waiting time target performance for the exploratory analysis
 ```{r o,message = FALSE, warning = FALSE, results='hide'}
 ae<- ae %>%
 mutate(performance = round(1- breaches / attendances,2))
 ```
 
 
-## **4. Selecting variables for data capture tool** 
-The variables I have selected for the data capture tool: Index, period, org_ code, attendance, breaches and performance
+## **4. Selecting variables for the data capture tool** 
+The variables I have selected for the data capture tool are: index, period, org_ code, attendance, breaches and performance
 
 ### **Filter type 1 A&E departments and select variables for the data capture tool**
 ```{r r,message = FALSE, warning = FALSE, results='hide'}
@@ -95,7 +95,7 @@ ae2<-ae %>%
 ```
 
 ### **Tabulate the raw data**
-To assists the reader in quickly determining the magnitude of the numbers they are looking at.
+We tabulate the raw data to make the date and numbers more readable (date will appear in month-year format and numbers will have a coma at 1000s).
 ```{r s,message = FALSE, warning = FALSE, results='hide'}
 ae2 %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
@@ -104,57 +104,56 @@ ae2 %>%
   kable()
 ```
 
-### **Save csv file to Raw data folder**
+### **Save csv file to 'RawData' folder**
 ```{r t,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae2, here("RawData", "ae_type1_performance.full.csv"))
 ```
 
-## **5. Partitioning the raw data into test and training data**
-We have to work out the proportion (`prop`) of the raw data to assign to the training data:
+## **5. Split the raw data into test and training data**
+We have to work out the proportion of the raw data to assign to the training data (it should be 10-15).
 ```{r w,message = FALSE, warning = FALSE, results='hide'}
 prop<-(1-(15/nrow(ae2)))
-#The proportion of the raw that needs to be assigned to the training data to ensure there is only 10 to 15 records in the test data.
 print(prop)
 ```
 
 ### **Random number generator**
-The 'set.seed()' function is a random number generator which will make sure that every time we run this script, we will partition the raw data into the same test and training data.
+The 'set.seed()' function is a random number generator which will make sure that every time we run this script the raw data will be split into the same test and training data.
 ```{r seed,message = FALSE, warning = FALSE, results='hide'}
 set.seed(333)
 ```
 
 ### **Split dataset**
-We use the createDataPartition() function from the caret package to split our raw data into test and training data sets. 
+We use the 'createDataPartition()' function to split our raw data into test and training data sets.
+The 'trainIndex' will contain the training data.
 ```{r pr,message = FALSE, warning = FALSE, results='hide'}
 trainIndex <- createDataPartition(ae2$index, p = prop, 
                                   list = FALSE, 
                                   times = 1)
 ```
 
-### **We need the records that are in the trainIndex are assigned to the training data.**
 ```{r trainindex,message = FALSE, warning = FALSE, results='hide'}
 ae2Train <- ae2[ trainIndex,]
 ```
 
 
-### **Save ae_type1_performance training data to the working data folder 'Data'**
+### **Save *ae_type1_performance* training data to the 'Data' folder**
 ```{r write,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae2Train, here("Data", "ae_type1_performance_train_full.csv"))
 ```
 
-### **Extract the ae_type1_performance test data that records not in the trainIndex (`-trainIndex`) are assigned to the test data.**
+### **Extract the *ae_type1_performance* test data records not in the 'trainIndex' so we will left with the test data.**
 ```{r test,message = FALSE, warning = FALSE, results='hide'}
 ae2Test  <- ae2[-trainIndex,]
 ```
 
 ### **Marker test data**
-We need to set aside the first record from the ae_type1_performance test data so that your markers can test and evaluate your data-capture tool.
+We need to set aside the first record from the ae_type1_performance test data for the markers to test and evaluate the data-capture tool.
 ```{r testmarker,message = FALSE, warning = FALSE, results='hide'}
 ae2TestMarker  <- ae2Test[1,]
 ```
 
 
-### **Save ae_type1_performance marker test data to the Data folder**
+### **Save *ae_type1_performance* marker test data to the 'Data' folder**
 ```{r csv,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae2TestMarker, here("Data", "ae_type1_performance_test_marker_full.csv"))
 ```
@@ -164,20 +163,20 @@ write_csv(ae2TestMarker, here("Data", "ae_type1_performance_test_marker_full.csv
 ae2Test  <- ae2Test[2:nrow(ae2Test),]
 ```
 
-### **Finally save ae_type1_performance test data to the working data folder 'Data'**
+### **Finally save *ae_type1_performance* test data to the 'Data' folder**
 ```{r csv2,message = FALSE, warning = FALSE, results='hide'}
 write_csv(ae2Test, here("Data", "ae_type1_performance_test_full.csv"))
 ```
 
-# **II. Data capture tool in Python Jupyter notebook** 
+# **II. Data capture tool in Jupyter notebook** 
 ## **1. Data upload**
-We need to upload the previously selected subset of the variables (ae_type1_performance_test_full) for the data capture tool
+We need to upload the previously selected subset of the variables (*ae_type1_performance_test_full*) for the data capture tool.
 
 ### **Load the pandas package**
-To import the data, we will need to load the pandas package which is used for data manipulation and analysis.
+To import the data, we need to load the pandas package that is used for data manipulation and analysis.
 
 ### **Data type**
-We now need to check the data type in the test Data data frame in order to know what type of widget we need to use.
+We need to check the data type of the variables in the test data frame in order to know what type of widget we need to use.
 
 ## **2. Setting up an empty data frame**
 First we need to set up an empty data frame in the working data folder to collect the data captured by the Juypter widgets containing only the variables we want to capture
@@ -188,28 +187,28 @@ Finally we read in the empty data frame to collect the data from the Jupyter-wid
 The first variable contains the index number, that allows us to connect the test data to the original data set “../RawData/ae_type1_performance_test_full”. We need to change this for every record in the test dataset.
 
 ## **4. Widgets for the variables**
-We need to select widgets (eg. button, dropdown or textbox) to collect our test data in Python.
-To use the widget framework, we need to import the ipywidgets Python package.In order to select the widgets we previously checked the data type of the variables.
+We need to select widgets (eg. button, dropdown or textbox) to collect the test data in Python.
+To use the widget framework, we need to import the *ipywidgets* Python package.
 
 ### **Consent variable**
 Before we collect the data , we need to get consent from the end-user to process and share the data we will collect with the data capture tool. 
-The consent data type has 2 options, TRUE or FALSE (logical data type) so boolean widget (Checkbox widget) will be used that are designed to display a boolean value.
+The consent data type has 2 options, TRUE or FALSE (logical data type) so we need to use a boolean widget (Checkbox widget) that is designed to display a boolean value.
 
 ### **Period variable**
-Data type is string, character. DatePicker widget was selected to capture/collect period variable.
+Data type is string, character. DatePicker widget was selected to capture/collect period variable as date.
 
 ### **Org_code variable**
-Data type  is string, character. Selection widget was selected to capture this variable to display single selection list.
+Data type  is string, character. Selection widget was selected to capture this variable with displaying a single selection list.
 
 ### **Attendances, breaches variables**
-Data type for these variables is numeric, integer. Numeric widget was selected (IntText) for displaying integers.
+Data type for these variables is numeric, integer. Numeric widget was selected (*IntText*) for displaying integers.
 
 ### **Performance variable**
-Data type is numeric, float. Numeric widget (FloatText) was selected to collected this data.  
+Data type is numeric, float. Numeric widget (*FloatText*) was selected to collected this data.  
 
 
 ## **5. Concatenating the collected data to the CollectData data frame.**
-Every row needs to be filled in the empty data frame by using concat() function to concatenate pandas objects (11 rows of data).
+Every row needs to be filled in the empty data frame by using 'concat()' function to concatenate pandas objects (11 rows of data).
 
 ## **Consent check**
 Before we save our data to file, we must make sure we have consent to do so (we have consent filled in as TRUE).
@@ -227,7 +226,7 @@ library(here)
 ```
 
 ## **2. Data used**
-Test data was collected by the Jupyter Notebook  \"./ipynbScripts/CollectingDataUsingInteractiveJupyterWidgets.ipynb\".  
+Test data was collected by the Jupyter Notebook  \"./ipynbScripts/JupyterNotebookDataCaptureTool.ipynb\".  
 
 ### **Read the collected data from the Raw data folder.**
 ```{r data3,message = FALSE, warning = FALSE, results='hide'}
@@ -249,16 +248,16 @@ CollectedData$period<-as.character(CollectedData$period)
 ```{r data6,message = FALSE, warning = FALSE, results='hide'}
 class(CollectedData$period)
 ```
-Now it's a character variable.
+Now it's a *character* variable.
 
 
-## **3. Build a data dictionary for the data collected by the data capture tool**
+## **3. Building a data dictionary for the data captured by the data capture tool**
 
 ### **Build a linker data frame**
-We first need to build a linker data frame. To do this, we need to create two string vectors representing the different variable descriptions and the different variable types.
+First a linker data frame needs to be created: for the different variable descriptions and for the variable types two string vectors will be created.
 
 #### **Variable descriptions**  
-We need to create a string vector representing the different variable descriptions.
+Setting up a string vector for the different variable descriptions.
 
 ```{r variable_description,message = FALSE, warning = FALSE, results='hide'}
 variable_description <- c("The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.",
@@ -272,28 +271,29 @@ print(variable_description)
 ```
 
 #### **Variable types**    
-We need to create a string vector representing the different variable types. It is a vector of integers with values 0 or 1. We need to use 0 for a variable with quantitative values (measured values) variables and 1 for fixed values (allowable values or codes) variables.
+Setting up a string vector with values 0 or 1 for the different variable types. For variables with quantitative values we will use 0 (measured values) and 1 for for variables with fixed values (e.g. codes).
 
 **To view the variable types in the CollectedData data frame.**
 ```{r glimpse3,message = FALSE, warning = FALSE, results='hide'}
 glimpse(CollectedData) 
 ```
 
-**We have four quantitative values (measured values) variables and three fixed values (allowable values or codes) variables.**
+
+**We have four variables with quantitative values (*index,attendances, breaches, performance*)  and three variables with fixed values (*date, org_code, consent*) **
 ```{r variable_type,message = FALSE, warning = FALSE, results='hide'}
 variable_type <- c(0, 1, 1, 0, 0, 0, 1)
 print(variable_type)
 ```
 
 ## **4. Linker**
-We use the `build_linker()` function from the *dataMeta* package to construct an intermediary (linker) data frame between the CollectedData and the data dictionary. 
+We need to build an intermediary (linker) data frame between the CollectedData and the data dictionary so the `build_linker()` function is used from the *dataMeta* package. 
 ```{r build_linker,message = FALSE, warning = FALSE, results='hide'}
 linker<-build_linker(CollectedData, variable_description, variable_type)
 print(linker)
 ```
 
 ## **5. Data dictionary**
-We use the `build_dict()` function from the *dataMeta* to constructs a data dictionary for a CollectedData data frame with the aid of the linker data frame between.
+To construct a data dictionary for a CollectedData data frame with the help of the linker data frame between we use the `build_dict()` function .
 ```{r dictionary,message = FALSE, warning = FALSE, results='hide'}
 dictionary <- build_dict(my.data = CollectedData, linker = linker)
 glimpse(dictionary)
@@ -322,9 +322,11 @@ write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
 ```
 
 ## **6. Append data dictionary to the CollectedData**
-We will now incorporate attributes as metadata to the CollectedData as metadata using the 'incorporate_attr()' function from the *dataMeta* package.
+Attributes need to be built in as metadata to the CollectedData using the 'incorporate_attr()' function. To run this function, the CollectedData and dictionary and main_string are required to be inputs.  
 
-#### **Create main_string for attributes**
+#### **Create main_string for attributes**  
+
+Main_string is a character string describing the CollectedData data frame.
 ```{r main_string,message = FALSE, warning = FALSE, results='hide'}
 main_string <- "This data describes the NHS England type 1 accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
 main_string
@@ -332,7 +334,8 @@ main_string
 
 
 #### **Incorporate attributes as metada**  
-We are using the 'incorporate_attr()' function to return an R dataset containing metadata stored in its attributes.
+
+The 'incorporate_attr()' function is used to return an R dataset containing metadata stored in its attributes.
 ```{r complete_dataset,message = FALSE, warning = FALSE, results='hide'}
 complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
 main_string = main_string)
