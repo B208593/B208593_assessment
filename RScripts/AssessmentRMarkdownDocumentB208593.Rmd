@@ -1,6 +1,5 @@
 ---
-title: '**Working with data types and structures in Python and R: My First R Markdown
-  Document**'
+title: '**Working with data types and structures in Python and R: Assessment R Markdown Document**'
 author: "B208593"
 date: "`r format (Sys.time (), '%d %B, %Y')`"
 output:
@@ -41,7 +40,7 @@ library(lubridate)
 library(caret)
 ```
 
-## **2. Load the NHS England accident and emergency attendances and admissions (ae_attendances) dataset**
+## **2. Load the NHS England accident and emergency attendances and admissions (*ae_attendances*) dataset**
 ```{r g,message = FALSE, warning = FALSE, results='hide'}
 data(ae_attendances)
 ```  
@@ -228,23 +227,23 @@ library(here)
 ## **2. Data used**
 Test data was collected by the Jupyter Notebook  \"./ipynbScripts/JupyterNotebookDataCaptureTool.ipynb\".  
 
-### **Read the collected data from the Raw data folder.**
+### **Read the collected data from the 'RawData' folder.**
 ```{r data3,message = FALSE, warning = FALSE, results='hide'}
 CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
 ```
 
-### **Check type of the period variable** 
+### **Check type of the 'period' variable** 
 ```{r data4,message = FALSE, warning = FALSE, results='hide'}
 class(CollectedData$period)
 ```
-It's identified as *date* but we need the period to be *character* for the Data dictionary.
+It's identified as *date* but we need the 'period' to be *character* for the Data dictionary.
 
-### **Change period variable from date to character**
+### **Change 'period' variable from *date* to *character* **
 ```{r data5,message = FALSE, warning = FALSE, results='hide'}
 CollectedData$period<-as.character(CollectedData$period)
 ```
 
-**Check 'type' of period variable**
+**Check type of 'period' variable**
 ```{r data6,message = FALSE, warning = FALSE, results='hide'}
 class(CollectedData$period)
 ```
@@ -253,10 +252,10 @@ Now it's a *character* variable.
 
 ## **3. Building a data dictionary for the data captured by the data capture tool**
 
-### **Build a linker data frame**
+### **Building a linker data frame**
 First a linker data frame needs to be created: for the different variable descriptions and for the variable types two string vectors will be created.
 
-#### **Variable descriptions**  
+### **Variable descriptions**  
 Setting up a string vector for the different variable descriptions.
 
 ```{r variable_description,message = FALSE, warning = FALSE, results='hide'}
@@ -270,10 +269,10 @@ variable_description <- c("The index column that allows us to link the data coll
 print(variable_description)
 ```
 
-#### **Variable types**    
+### **Variable types**    
 Setting up a string vector with values 0 or 1 for the different variable types. For variables with quantitative values we will use 0 (measured values) and 1 for for variables with fixed values (e.g. codes).
 
-**To view the variable types in the CollectedData data frame.**
+**To view the variable types in the 'CollectedData' data frame.**
 ```{r glimpse3,message = FALSE, warning = FALSE, results='hide'}
 glimpse(CollectedData) 
 ```
@@ -286,14 +285,14 @@ print(variable_type)
 ```
 
 ## **4. Linker**
-We need to build an intermediary (linker) data frame between the CollectedData and the data dictionary so the `build_linker()` function is used from the *dataMeta* package. 
+We need to build an intermediary (linker) data frame between the 'CollectedData' and the data dictionary so the `build_linker()` function is used from the *dataMeta* package. 
 ```{r build_linker,message = FALSE, warning = FALSE, results='hide'}
 linker<-build_linker(CollectedData, variable_description, variable_type)
 print(linker)
 ```
 
 ## **5. Data dictionary**
-To construct a data dictionary for a CollectedData data frame with the help of the linker data frame between we use the `build_dict()` function .
+To construct a data dictionary for a 'CollectedData' data frame with the help of the linker data frame between we use the `build_dict()` function .
 ```{r dictionary,message = FALSE, warning = FALSE, results='hide'}
 dictionary <- build_dict(my.data = CollectedData, linker = linker)
 glimpse(dictionary)
@@ -321,20 +320,17 @@ dictionary[15,4]<-" NHS Trust - EAST SUFFOLK AND NORTH ESSEX NHS FOUNDATION TRUS
 write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
 ```
 
-## **6. Append data dictionary to the CollectedData**
-Attributes need to be built in as metadata to the CollectedData using the 'incorporate_attr()' function. To run this function, the CollectedData and dictionary and main_string are required to be inputs.  
+## **6. Append data dictionary to the 'CollectedData'**
+Attributes need to be built in as metadata to the 'CollectedData' using the 'incorporate_attr()' function. To run this function, the 'CollectedData' and dictionary and main_string are required to be inputs.  
 
-#### **Create main_string for attributes**  
+### **Create main_string for attributes**  
 
-Main_string is a character string describing the CollectedData data frame.
+Main_string is a character string describing the 'CollectedData' data frame.
 ```{r main_string,message = FALSE, warning = FALSE, results='hide'}
 main_string <- "This data describes the NHS England type 1 accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
 main_string
 ```  
-
-
-#### **Incorporate attributes as metada**  
-
+### **Incorporate attributes as metada**
 The 'incorporate_attr()' function is used to return an R dataset containing metadata stored in its attributes.
 ```{r complete_dataset,message = FALSE, warning = FALSE, results='hide'}
 complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
@@ -343,8 +339,7 @@ attributes(complete_CollectedData)$author[1]<-"B208593"
 complete_CollectedData
 attributes(complete_CollectedData)
 ```
-
-#### **Save the CollectedData with attributes**
+### **Save the CollectedData with attributes**
 ```{r save_it,message = FALSE, warning = FALSE, results='hide'}
 save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
 ```
