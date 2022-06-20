@@ -9,7 +9,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-[Link to the GitHub repository] (https://github.com/B208593/B208593_assessment.git)  
+[Link to the GitHub repository](https://github.com/B208593/B208593_assessment.git)  
 
 # **I. Loading NHSR datasets**
 The data I used for this assessment are from the NHSRdatasets package: the NHS England accident and emergency attendances and admissions (*ae_attendances*) data set.  
