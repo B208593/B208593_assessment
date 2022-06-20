@@ -3,17 +3,17 @@ attendances,The number of attendances for type 1 A&E department at this organisa
 breaches,The number of attendances that breached the four-hour target.,86 to 3178,
 consent,The consent from the end-user to process and share the data collected with the data capture tool.,TRUE,
 index,The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.,2826 to 12463,
-org_code,The Organisation data service (ODS) code for the organisation.,RGT,
- , ,RM1,
- , ,RRK,
- , ,RJN,
- , ,RNZ,
- , ,RQ3,
- , ,RBL,
- , ,R1K,
- , ,RPA,
- , ,RA3,
- , ,RDE,
+org_code,The Organisation data service (ODS) code for the organisation.,RGT, NHS Trust - CAMBRIDGE UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RGT).
+ , ,RM1, NHS Trust - NORFOLK AND NORWICH UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RM1).
+ , ,RRK, NHS Trust - UNIVERSITY HOSPITALS BIRMINGHAM NHS FOUNDATION TRUST (RRK).
+ , ,RJN, NHS Trust - EAST CHESHIRE NHS TRUST (RJN).
+ , ,RNZ, NHS Trust - SALISBURY NHS FOUNDATION TRUST (RNZ).
+ , ,RQ3, NHS Trust - BIRMINGHAM WOMEN'S AND CHILDREN'S NHS FOUNDATION TRUST (RQ3).
+ , ,RBL, NHS Trust - WIRRAL UNIVERSITY TEACHING HOSPITAL NHS FOUNDATION TRUST (RBL).
+ , ,R1K, NHS Trust - LONDON NORTH WEST UNIVERSITY HEALTHCARE NHS TRUST (R1K).
+ , ,RPA, NHS Trust - MEDWAY NHS FOUNDATION TRUST (RPA).
+ , ,RA3, NHS Trust - WESTON AREA HEALTH NHS TRUST (RA3).
+ , ,RDE, NHS Trust - EAST SUFFOLK AND NORTH ESSEX NHS FOUNDATION TRUST (RDE).
 performance,The performance ([1 - breaches]/attendances) calculated for type 1 A&E departments.,0.71 to 0.98,
 period,"The month that this activity relates to, stored as a date (1st of each month).",2016-07-01,
  , ,2016-04-01,
