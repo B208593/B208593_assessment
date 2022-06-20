@@ -127,11 +127,20 @@ dictionary <- build_dict(my.data = CollectedData, linker = linker)
 glimpse(dictionary)
 ```
 
-x=rows, y=columns
-```{r notes}
-dictionary[1,1]<-"."
-dictionary[1,1]<-"."
-```
+### **Fill in the organisation codes**
+```{r orgcode,message = FALSE, warning = FALSE, results='hide'}
+dictionary[5,4]<-" NHS Trust - CAMBRIDGE UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RGT)."
+dictionary[6,4]<-" NHS Trust - NORFOLK AND NORWICH UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RM1)."
+dictionary[7,4]<-" NHS Trust - UNIVERSITY HOSPITALS BIRMINGHAM NHS FOUNDATION TRUST (RRK)."
+dictionary[8,4]<-" NHS Trust - EAST CHESHIRE NHS TRUST (RJN)."
+dictionary[9,4]<-" NHS Trust - SALISBURY NHS FOUNDATION TRUST (RNZ)."
+dictionary[10,4]<-" NHS Trust - BIRMINGHAM WOMEN'S AND CHILDREN'S NHS FOUNDATION TRUST (RQ3)."
+dictionary[11,4]<-" NHS Trust - WIRRAL UNIVERSITY TEACHING HOSPITAL NHS FOUNDATION TRUST (RBL)."
+dictionary[12,4]<-" NHS Trust - LONDON NORTH WEST UNIVERSITY HEALTHCARE NHS TRUST (R1K)."
+dictionary[13,4]<-" NHS Trust - MEDWAY NHS FOUNDATION TRUST (RPA)."
+dictionary[14,4]<-" NHS Trust - WESTON AREA HEALTH NHS TRUST (RA3)."
+dictionary[15,4]<-" NHS Trust - EAST SUFFOLK AND NORTH ESSEX NHS FOUNDATION TRUST (RDE)."
+```  
  
 
 ### **Let's save the data dictionary for CollectedData to the 'RawData' folder**
