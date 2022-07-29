@@ -1,10 +1,12 @@
 ---
-title: '**Working with data types and structures in Python and R: Assessment R Markdown Document**'
+title: '**Working with data types and structures in Python and R: Assessment R Markdown
+  Document**'
 author: "B208593"
 date: "`r format (Sys.time (), '%d %B, %Y')`"
 output:
-  html_document: default
+  word_document: default
   pdf_document: default
+  html_document: default
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -18,10 +20,10 @@ The data I used for this assessment are from the NHSRdatasets package: the NHS E
 
 ## **1. Load packages**
 First we need to load the packages we will use in the script.
-```{r a,message = FALSE, warning = FALSE, results='hide'}
+```{r a,message = FALSE, warning = FALSE}
 library(NHSRdatasets)
 ```
-```{r d,message = FALSE, warning = FALSE, results='hide'}
+```{r d,message = FALSE, warning = FALSE}
 library(tidyverse)
 ```
 ```{r b,message = FALSE, warning = FALSE}
@@ -41,13 +43,13 @@ library(caret)
 ```
 
 ## **2. Load the NHS England accident and emergency attendances and admissions (*ae_attendances*) dataset**
-```{r g,message = FALSE, warning = FALSE, results='hide'}
+```{r g,message = FALSE, warning = FALSE}
 data(ae_attendances)
 ```  
 
 
 ## **3. Viewing the *ae_attendances* data**
-```{r h,message = FALSE, warning = FALSE, echo=FALSE, results='hide'}
+```{r h,message = FALSE, warning = FALSE}
 data(ae_attendances)
 ae<-ae_attendances
 class(ae)
@@ -56,7 +58,7 @@ class(ae)
 
 ### **Missing data**
 We need to check for missing data in the *ae_attendances* data as missing data can significantly impact any attempt to gain meaningful insight from data.   
-```{r k,message = FALSE, warning = FALSE, results='hide'}
+```{r k,message = FALSE, warning = FALSE}
 # Calculate how many NAs there are in each variable
 ae %>% 
   map(is.na) %>%
@@ -65,7 +67,7 @@ map(sum)
 
 ### **Adding index column to raw data** 
 To set up a data capture tool in Python, the raw data are needed to be split into training and testing sets. We need to add an index column to the raw data so we can link the partitioned data sets to the raw data. 
-```{r l,message = FALSE, warning = FALSE, results='hide'}
+```{r l,message = FALSE, warning = FALSE}
 ae <- rowid_to_column(ae, "index")
 ```  
 
@@ -77,7 +79,7 @@ write_csv(ae, here("RawData", "ae_attendances.csv"))
 
 ### **Creating a new variable**
 We need to calculate monthly four hour waiting time target performance for the exploratory analysis
-```{r o,message = FALSE, warning = FALSE, echo=FALSE}
+```{r o,message = FALSE, warning = FALSE}
 ae<- ae %>%
 mutate(performance = round(1- breaches / attendances,2))
 ```
@@ -87,15 +89,37 @@ mutate(performance = round(1- breaches / attendances,2))
 The variables I have selected for the data capture tool are: index, period, org_ code, attendance, breaches and performance
 
 ### **Filter type 1 A&E departments and select variables for the data capture tool**
-```{r r,message = FALSE, warning = FALSE, results='hide'}
+```{r r,message = FALSE, warning = FALSE}
 ae2<-ae %>%
   filter(type=="1") %>%
   select(-type, -admissions) 
 ```
 
+### **Visualise perfomance**
+```{r r22,message = FALSE, warning = FALSE}
+type1_performance <- ae2 %>%
+  group_by(period) %>%
+  summarise_at(vars(attendances, breaches), sum) %>%
+  mutate(performance = 1- breaches / attendances)
+```
+
+
+```{r r23,message = FALSE, warning = FALSE}
+ggplot(type1_performance, aes(period, performance)) +
+  geom_line(color = "darkcyan") +
+  geom_point(color = "darkcyan") +
+  scale_y_continuous(labels = percent) +
+  scale_x_date(date_labels = "%b-%y", date_breaks = "11 month")+
+  labs(x = "Month of attendance",
+       y = "% of A&E attendances that met the four hour standard",
+       title = "NHS type 1 accident and emergency (A&E) four hour performance",
+       caption = "Source: NHSRdatasets")
+```
+
+
 ### **Tabulate the raw data**
 We tabulate the raw data to make the date and numbers more readable (date will appear in month-year format and numbers will have a coma at 1000s).
-```{r s,message = FALSE, warning = FALSE, echo=FALSE, results='hide'}
+```{r s,message = FALSE, warning = FALSE}
 ae2 %>%
   mutate_at(vars(period), format, "%b-%y") %>% 
   mutate_at(vars(attendances, breaches), comma) %>%
@@ -104,66 +128,66 @@ ae2 %>%
 ```
 
 ### **Save csv file to 'RawData' folder**
-```{r t,message = FALSE, warning = FALSE, results='hide'}
+```{r t,message = FALSE, warning = FALSE}
 write_csv(ae2, here("RawData", "ae_type1_performance.full.csv"))
 ```
 
 ## **5. Split the raw data into test and training data**
 We have to work out the proportion of the raw data to assign to the training data (it should be 10-15).
-```{r w,message = FALSE, warning = FALSE, results='hide'}
+```{r w,message = FALSE, warning = FALSE}
 prop<-(1-(15/nrow(ae2)))
 print(prop)
 ```
 
 ### **Random number generator**
 The 'set.seed()' function is a random number generator which will make sure that every time we run this script the raw data will be split into the same test and training data.
-```{r seed,message = FALSE, warning = FALSE, results='hide'}
+```{r seed,message = FALSE, warning = FALSE}
 set.seed(333)
 ```
 
 ### **Split dataset**
 We use the 'createDataPartition()' function to split our raw data into test and training data sets.
 The 'trainIndex' will contain the training data.
-```{r pr,message = FALSE, warning = FALSE, echo=FALSE}
+```{r pr,message = FALSE, warning = FALSE}
 trainIndex <- createDataPartition(ae2$index, p = prop, 
                                   list = FALSE, 
                                   times = 1)
 ```
 
-```{r trainindex,message = FALSE, warning = FALSE, results='hide'}
+```{r trainindex,message = FALSE, warning = FALSE}
 ae2Train <- ae2[ trainIndex,]
 ```
 
 
 ### **Save *ae_type1_performance* training data to the 'Data' folder**
-```{r write,message = FALSE, warning = FALSE, results='hide'}
+```{r write,message = FALSE, warning = FALSE}
 write_csv(ae2Train, here("Data", "ae_type1_performance_train_full.csv"))
 ```
 
 ### **Extract the *ae_type1_performance* test data records not in the 'trainIndex' so we will left with the test data.**
-```{r test,message = FALSE, warning = FALSE, results='hide'}
+```{r test,message = FALSE, warning = FALSE}
 ae2Test  <- ae2[-trainIndex,]
 ```
 
 ### **Marker test data**
 We need to set aside the first record from the ae_type1_performance test data for the markers to test and evaluate the data-capture tool.
-```{r testmarker,message = FALSE, warning = FALSE, results='hide'}
+```{r testmarker,message = FALSE, warning = FALSE}
 ae2TestMarker  <- ae2Test[1,]
 ```
 
 
 ### **Save *ae_type1_performance* marker test data to the 'Data' folder**
-```{r csv,message = FALSE, warning = FALSE, results='hide'}
+```{r csv,message = FALSE, warning = FALSE}
 write_csv(ae2TestMarker, here("Data", "ae_type1_performance_test_marker_full.csv"))
 ```
 
 ### **Set aside the remaining records to test the data-capture tool.**
-```{r datac,message = FALSE, warning = FALSE, results='hide'}
+```{r datac,message = FALSE, warning = FALSE}
 ae2Test  <- ae2Test[2:nrow(ae2Test),]
 ```
 
 ### **Finally save *ae_type1_performance* test data to the 'Data' folder**
-```{r csv2,message = FALSE, warning = FALSE, results='hide'}
+```{r csv2,message = FALSE, warning = FALSE}
 write_csv(ae2Test, here("Data", "ae_type1_performance_test_full.csv"))
 ```
 
@@ -218,7 +242,7 @@ We need to save the data collected by the data-capture tool to the Data and Raw 
  
 # **III. Data dictionary**
 ## **1. Load packages**
-```{r load,message = FALSE, warning = FALSE, results='hide'}
+```{r load,message = FALSE, warning = FALSE}
 library(dataMeta)
 library (tidyverse)
 library(here)
@@ -228,23 +252,23 @@ library(here)
 Test data was collected by the Jupyter Notebook  \"./ipynbScripts/JupyterNotebookDataCaptureTool.ipynb\".  
 
 ### **Read the collected data from the 'RawData' folder.**
-```{r data3,message = FALSE, warning = FALSE, results='hide'}
+```{r data3,message = FALSE, warning = FALSE}
 CollectedData=read_csv(here("RawData", "CollectedDataFinal.csv"))
 ```
 
 ### **Check type of the 'period' variable** 
-```{r data4,message = FALSE, warning = FALSE, results='hide'}
+```{r data4,message = FALSE, warning = FALSE}
 class(CollectedData$period)
 ```
 It's identified as *date* but we need the 'period' to be *character* for the Data dictionary.
 
 ### **Change 'period' variable from *date* to *character* **
-```{r data5,message = FALSE, warning = FALSE, results='hide'}
+```{r data5,message = FALSE, warning = FALSE}
 CollectedData$period<-as.character(CollectedData$period)
 ```
 
 **Check type of 'period' variable**
-```{r data6,message = FALSE, warning = FALSE, results='hide'}
+```{r data6,message = FALSE, warning = FALSE}
 class(CollectedData$period)
 ```
 Now it's a *character* variable.
@@ -258,7 +282,7 @@ First a linker data frame needs to be created: for the different variable descri
 ### **Variable descriptions**  
 Setting up a string vector for the different variable descriptions.
 
-```{r variable_description,message = FALSE, warning = FALSE, results='hide'}
+```{r variable_description,message = FALSE, warning = FALSE}
 variable_description <- c("The index column that allows us to link the data collected to the original ae_attendances data in the 'RawData' folder.",
 "The month that this activity relates to, stored as a date (1st of each month).",
 "The Organisation data service (ODS) code for the organisation.", 
@@ -273,33 +297,33 @@ print(variable_description)
 Setting up a string vector with values 0 or 1 for the different variable types. For variables with quantitative values we will use 0 (measured values) and 1 for for variables with fixed values (e.g. codes).
 
 **To view the variable types in the 'CollectedData' data frame.**
-```{r glimpse3,message = FALSE, warning = FALSE, results='hide'}
+```{r glimpse3,message = FALSE, warning = FALSE}
 glimpse(CollectedData) 
 ```
 
 
 **We have four variables with quantitative values (*index,attendances, breaches, performance*)  and three variables with fixed values (*date, org_code, consent*) **
-```{r variable_type,message = FALSE, warning = FALSE, results='hide'}
+```{r variable_type,message = FALSE, warning = FALSE}
 variable_type <- c(0, 1, 1, 0, 0, 0, 1)
 print(variable_type)
 ```
 
 ## **4. Linker**
 We need to build an intermediary (linker) data frame between the 'CollectedData' and the data dictionary so the `build_linker()` function is used from the *dataMeta* package. 
-```{r build_linker,message = FALSE, warning = FALSE, results='hide'}
+```{r build_linker,message = FALSE, warning = FALSE}
 linker<-build_linker(CollectedData, variable_description, variable_type)
 print(linker)
 ```
 
 ## **5. Data dictionary**
 To construct a data dictionary for a 'CollectedData' data frame with the help of the linker data frame between we use the `build_dict()` function .
-```{r dictionary,message = FALSE, warning = FALSE, results='hide'}
+```{r dictionary,message = FALSE, warning = FALSE}
 dictionary <- build_dict(my.data = CollectedData, linker = linker)
 glimpse(dictionary)
 ```  
 
 ### **Fill in the organisation codes**
-```{r orgcode,message = FALSE, warning = FALSE, results='hide'}
+```{r orgcode,message = FALSE, warning = FALSE}
 dictionary[5,4]<-" NHS Trust - CAMBRIDGE UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RGT)."
 dictionary[6,4]<-" NHS Trust - NORFOLK AND NORWICH UNIVERSITY HOSPITALS NHS FOUNDATION TRUST (RM1)."
 dictionary[7,4]<-" NHS Trust - UNIVERSITY HOSPITALS BIRMINGHAM NHS FOUNDATION TRUST (RRK)."
@@ -316,7 +340,7 @@ dictionary[15,4]<-" NHS Trust - EAST SUFFOLK AND NORTH ESSEX NHS FOUNDATION TRUS
 
 
 ### **Save the data dictionary for CollectedData to the 'RawData' folder**
-```{r w2,message = FALSE, warning = FALSE, results='hide'}
+```{r w2,message = FALSE, warning = FALSE}
 write_csv(dictionary, here("RawData", "CollectedData_DataDictionary.csv"))
 ```
 
@@ -326,13 +350,13 @@ Attributes need to be built in as metadata to the 'CollectedData' using the 'inc
 ### **Create main_string for attributes**  
 
 Main_string is a character string describing the 'CollectedData' data frame.
-```{r main_string,message = FALSE, warning = FALSE, results='hide'}
+```{r main_string,message = FALSE, warning = FALSE}
 main_string <- "This data describes the NHS England type 1 accident and emergency (A&E) attendances and breaches of four-hour wait time target data from the *NHSRdatasets* package collected by the data capture tool."
 main_string
 ```  
 ### **Incorporate attributes as metada**
 The 'incorporate_attr()' function is used to return an R dataset containing metadata stored in its attributes.
-```{r complete_dataset,message = FALSE, warning = FALSE, results='hide'}
+```{r complete_dataset,message = FALSE, warning = FALSE}
 complete_CollectedData <- incorporate_attr(my.data = CollectedData, data.dictionary = dictionary,
 main_string = main_string)
 attributes(complete_CollectedData)$author[1]<-"B208593"
@@ -340,7 +364,7 @@ complete_CollectedData
 attributes(complete_CollectedData)
 ```
 ### **Save the CollectedData with attributes**
-```{r save_it,message = FALSE, warning = FALSE, results='hide'}
+```{r save_it,message = FALSE, warning = FALSE}
 save_it(complete_CollectedData, here("RawData", "complete_CollectedData"))
 ```
 
